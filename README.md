@@ -171,17 +171,16 @@ This project is licensed under the MIT License. See [LICENSE](./LICENSE) file fo
 
 ## 🔗 Links
 
-- Website: https://noctura.io
-- Documentation: https://docs.noctura.io
+- Website: https://noc-tura.io
+- Documentation: https://noc-tura.io/whitepaper.pdf
 - GitHub: https://github.com/NOC-tura/NOCtura-Wallet
 - Audit Reports: [docs/AUDIT_REPORTS](./docs/AUDIT_REPORTS)
 
 ## 📞 Contact
 
-- Security Issues: security@noctura.io
-- General Inquiries: hello@noctura.io
-- Twitter: [@NocturaWallet](https://twitter.com/NocturaWallet)
-- Discord: [Join Community](https://discord.gg/noctura)
+- Security Issues: privacy@noctura.io
+- Twitter: [@NocturaWallet](https://x.com/NOC_tura_)
+- Discord: [Join Community](https://discord.com/invite/j7kc2fJw4T)
 
 ---
 
