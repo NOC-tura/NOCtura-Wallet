@@ -1,0 +1,9 @@
+{
+  "name": "@noctura/relayer-service",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc"
+  }
+}

@@ -1,0 +1,40 @@
+* text=auto eol=lf
+
+# TypeScript
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+
+# JSON
+*.json text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+# Rust
+*.rs text eol=lf
+*.toml text eol=lf
+
+# Solidity/Circom
+*.sol text eol=lf
+*.circom text eol=lf
+*.cairo text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Binary files
+*.wasm binary
+*.zkey binary
+*.ptau binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary

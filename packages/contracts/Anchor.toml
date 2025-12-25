@@ -1,0 +1,27 @@
+[settings]
+read-only = false
+
+[programs.devnet]
+privacy-layer = "PrivacyLayerAddress"
+token-vault = "TokenVaultAddress"
+staking = "StakingAddress"
+governance = "GovernanceAddress"
+
+[programs.testnet]
+privacy-layer = "PrivacyLayerAddress"
+token-vault = "TokenVaultAddress"
+staking = "StakingAddress"
+governance = "GovernanceAddress"
+
+[programs.mainnet]
+privacy-layer = "PrivacyLayerAddress"
+token-vault = "TokenVaultAddress"
+staking = "StakingAddress"
+governance = "GovernanceAddress"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "jest"

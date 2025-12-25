@@ -1,0 +1,6 @@
+{
+  "name": "@noctura/compliance",
+  "version": "0.1.0",
+  "description": "Compliance and auditing tools",
+  "main": "dist/index.js"
+}

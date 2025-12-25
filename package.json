@@ -1,0 +1,59 @@
+{
+  "name": "noctura-wallet",
+  "version": "0.1.0",
+  "description": "Noctura - Complete Solana Dual Mode Privacy Wallet",
+  "private": true,
+  "license": "MIT",
+  "author": "NOCtura Team",
+  "homepage": "https://noctura.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NOC-tura/NOCtura-Wallet.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "postinstall": "pnpm run prepare",
+    "prepare": "husky install",
+    "build": "turbo run build",
+    "build:all": "turbo run build --include-dependencies",
+    "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
+    "test:unit": "turbo run test:unit",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "generate-types": "turbo run generate-types",
+    "cli": "pnpm --filter @noctura/cli",
+    "docs": "pnpm --filter @noctura/docs"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "backend/*",
+    "tools/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "^5.0.0"
+    }
+  }
+}

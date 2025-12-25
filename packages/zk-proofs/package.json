@@ -1,0 +1,23 @@
+{
+  "name": "@noctura/zk-proofs",
+  "version": "0.1.0",
+  "description": "ZK-Proof systems for Noctura Wallet",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "compile-circuits": "bash scripts/compile-circuits.sh",
+    "generate-keys": "bash scripts/generate-keys.sh",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.0",
+    "@noble/curves": "^1.2.0"
+  },
+  "devDependencies": {
+    "circom": "^2.1.0",
+    "circom_tester": "^0.2.0"
+  }
+}

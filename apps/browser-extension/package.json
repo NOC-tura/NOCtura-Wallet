@@ -1,0 +1,11 @@
+{
+  "name": "@noctura/browser-extension",
+  "version": "0.1.0",
+  "description": "Noctura Wallet Browser Extension",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "lint": "eslint src"
+  },
+  "manifest_version": 3
+}

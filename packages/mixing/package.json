@@ -1,0 +1,11 @@
+{
+  "name": "@noctura/mixing",
+  "version": "0.1.0",
+  "description": "Transaction mixing and relayer network",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest"
+  }
+}
