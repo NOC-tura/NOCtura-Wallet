@@ -2,7 +2,15 @@
  * Noctura SDK - TypeScript SDK for Noctura Wallet
  */
 
-import { WalletManager, WalletConfig } from '@noctura/core';
+import {
+  WalletManager,
+  AccountManager,
+  NetworkManager,
+  TokenRegistry,
+  TransparentTxBuilder,
+  WalletConfig,
+  NetworkConfig,
+} from '@noctura/core';
 import { Keypair } from '@solana/web3.js';
 
 /**
@@ -10,14 +18,46 @@ import { Keypair } from '@solana/web3.js';
  */
 export class NocturaSDK {
   public wallet: WalletManager;
+  public accounts: AccountManager;
+  public network: NetworkManager;
+  public tokens: TokenRegistry;
+  public txBuilder: TransparentTxBuilder;
+  
   private config: WalletConfig;
 
   constructor(config: WalletConfig) {
     this.config = config;
+
+    // Initialize network manager
+    const networkConfig: NetworkConfig = {
+      network: config.network || 'devnet',
+      commitment: config.commitment,
+    };
+    this.network = new NetworkManager(networkConfig);
+
     // Create a temporary keypair for wallet manager initialization
     // In production, this would be replaced with actual key management
     const keypair = Keypair.generate();
     this.wallet = new WalletManager(keypair, config);
+
+    // Initialize managers
+    this.accounts = new AccountManager();
+    this.tokens = new TokenRegistry();
+    this.txBuilder = new TransparentTxBuilder(this.network.getConnection());
+  }
+
+  /**
+   * Initialize SDK (load token lists, etc.)
+   */
+  public async initialize(): Promise<void> {
+    try {
+      await this.tokens.loadTokenList();
+      this.network.startHealthCheck();
+      console.log('Noctura SDK initialized');
+    } catch (error) {
+      console.error('SDK initialization error:', error);
+      throw error;
+    }
   }
 
   /**
@@ -25,6 +65,20 @@ export class NocturaSDK {
    */
   public getConfig(): WalletConfig {
     return this.config;
+  }
+
+  /**
+   * Test connection
+   */
+  public async testConnection(): Promise<boolean> {
+    return this.network.testConnection();
+  }
+
+  /**
+   * Get connection latency
+   */
+  public async getLatency(): Promise<number> {
+    return this.network.getLatency();
   }
 
   /**
@@ -37,6 +91,13 @@ export class NocturaSDK {
     const sdk = new NocturaSDK(config);
     sdk.wallet = new WalletManager(keypair, config);
     return sdk;
+  }
+
+  /**
+   * Cleanup resources
+   */
+  public destroy(): void {
+    this.network.destroy();
   }
 }
 
