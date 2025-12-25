@@ -1,7 +1,7 @@
 {
-  "name": "@noctura/mixing",
+  "name": "@noctura/ui-components",
   "version": "0.1.0",
-  "description": "Noctura Mixing Protocol and Relayer Network",
+  "description": "Reusable UI components for Noctura Wallet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -11,7 +11,11 @@
     "lint": "eslint src",
     "format": "prettier --write src"
   },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
   "dependencies": {
-    "@solana/web3.js": "^1.87.0"
+    "@noctura/core": "workspace:*"
   }
 }

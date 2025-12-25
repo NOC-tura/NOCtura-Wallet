@@ -1,7 +1,7 @@
 {
   "name": "@noctura/zk-proofs",
   "version": "0.1.0",
-  "description": "ZK-Proof systems for Noctura Wallet",
+  "description": "ZK-Proof systems (SNARK/STARK) for Noctura Wallet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,7 +10,8 @@
     "generate-keys": "bash scripts/generate-keys.sh",
     "dev": "tsc --watch",
     "test": "jest",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "format": "prettier --write src"
   },
   "dependencies": {
     "snarkjs": "^0.7.0",

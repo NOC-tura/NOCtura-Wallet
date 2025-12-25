@@ -1,0 +1,10 @@
+{
+  "name": "@noctura/price-oracle",
+  "version": "0.1.0",
+  "description": "Price Oracle Service",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc"
+  }
+}

@@ -1,6 +1,18 @@
 {
   "name": "@noctura/compliance",
   "version": "0.1.0",
-  "description": "Compliance and auditing tools",
-  "main": "dist/index.js"
+  "description": "Compliance and regulatory tools for Noctura Wallet",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src",
+    "format": "prettier --write src"
+  },
+  "dependencies": {
+    "@noctura/core": "workspace:*",
+    "@solana/web3.js": "^1.87.0"
+  }
 }

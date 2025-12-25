@@ -1,0 +1,15 @@
+{
+  "name": "@noctura/indexer",
+  "version": "0.1.0",
+  "description": "Noctura Blockchain Indexer",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.87.0"
+  }
+}

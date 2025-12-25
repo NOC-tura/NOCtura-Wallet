@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "cluster": "mainnet",
+  "programs": {
+    "privacy_layer": "PrivacyLayerAddress",
+    "token_vault": "TokenVaultAddress",
+    "staking": "StakingAddress",
+    "governance": "GovernanceAddress"
+  },
+  "rpc_endpoints": {
+    "primary": "https://api.mainnet-beta.solana.com",
+    "backup": [
+      "https://mainnet.rpcpool.com",
+      "https://genesysgo.net"
+    ]
+  }
+}
