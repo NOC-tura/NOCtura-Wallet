@@ -8,6 +8,8 @@ import {
   NetworkManager,
   TokenRegistry,
   TransparentTxBuilder,
+  ShieldedTxBuilder,
+  NoopProverClient,
   WalletConfig,
   NetworkConfig,
 } from '@noctura/core';
@@ -22,6 +24,7 @@ export class NocturaSDK {
   public network: NetworkManager;
   public tokens: TokenRegistry;
   public txBuilder: TransparentTxBuilder;
+  public shieldedTx: ShieldedTxBuilder;
   
   private config: WalletConfig;
 
@@ -44,6 +47,10 @@ export class NocturaSDK {
     this.accounts = new AccountManager();
     this.tokens = new TokenRegistry();
     this.txBuilder = new TransparentTxBuilder(this.network.getConnection());
+    this.shieldedTx = new ShieldedTxBuilder(
+      this.network.getConnection(),
+      new NoopProverClient()
+    );
   }
 
   /**
