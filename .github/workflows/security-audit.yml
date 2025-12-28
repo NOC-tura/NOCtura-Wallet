@@ -9,6 +9,7 @@ on:
       - 'packages/**'
       - 'backend/**'
       - 'pnpm-lock.yaml'
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   audit:
@@ -31,10 +32,57 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run npm audit
-        run: pnpm audit --audit-level moderate
+      - name: Run pnpm audit
+        id: pnpm-audit
+        run: |
+          echo "Running pnpm audit..."
+          pnpm audit --audit-level moderate --json > audit-results.json || true
+          cat audit-results.json
         continue-on-error: true
 
-      - name: Check for security vulnerabilities
-        run: pnpm exec snyk test --severity-threshold=high
+      - name: Install Snyk CLI
+        if: ${{ secrets.SNYK_TOKEN != '' }}
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        if: ${{ secrets.SNYK_TOKEN != '' }}
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Check for security vulnerabilities with Snyk
+        if: ${{ secrets.SNYK_TOKEN != '' }}
+        run: snyk test --severity-threshold=high --json > snyk-results.json || true
         continue-on-error: true
+
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-results
+          path: |
+            audit-results.json
+            snyk-results.json
+          if-no-files-found: ignore
+
+      - name: Security Audit Summary
+        if: always()
+        run: |
+          echo "## Security Audit Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### pnpm audit results" >> $GITHUB_STEP_SUMMARY
+          if [ -f audit-results.json ]; then
+            echo "✅ Audit completed - see artifacts for details" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Audit results not available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "### Snyk scan results" >> $GITHUB_STEP_SUMMARY
+            if [ -f snyk-results.json ]; then
+              echo "✅ Snyk scan completed - see artifacts for details" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ Snyk results not available" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "### Snyk scan" >> $GITHUB_STEP_SUMMARY
+            echo "⏭️ Skipped - SNYK_TOKEN not configured" >> $GITHUB_STEP_SUMMARY
+          fi
