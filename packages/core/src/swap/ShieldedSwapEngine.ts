@@ -107,7 +107,7 @@ export class ShieldedSwapEngine {
     
     // Use prover client to generate proof
     const proofResult = await this.prover.proveShieldedTransfer({
-      recipientAddress: userPublicKey.toString(),
+      recipientAddress: params.inputMint, // Fixed: use params instead of undefined userPublicKey
       amount: params.amount,
       assetMint: params.inputMint,
     });

@@ -33,7 +33,7 @@ export class NocturaSDK {
 
     // Initialize network manager
     const networkConfig: NetworkConfig = {
-      network: config.network || 'devnet',
+      network: (config.network as NetworkConfig['network']) || 'devnet',
       commitment: config.commitment,
     };
     this.network = new NetworkManager(networkConfig);

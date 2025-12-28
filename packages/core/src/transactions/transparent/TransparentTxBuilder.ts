@@ -18,8 +18,8 @@ import {
   createAssociatedTokenAccountInstruction,
 } from '@solana/spl-token';
 import { validateAddress, validateAmount } from '../../utils/Validation';
-import { NocturaError, InsufficientFundsError } from '../../types';
-import { FeeEstimator, PriorityLevel } from '../fee/FeeEstimator';
+import { NocturaError, InsufficientFundsError, PriorityLevel } from '../../types';
+import { FeeEstimator } from '../fee/FeeEstimator';
 
 export interface TransferParams {
   from: PublicKey;

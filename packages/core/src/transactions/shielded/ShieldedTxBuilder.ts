@@ -5,8 +5,8 @@ import type {
   ShieldedDepositParams,
   ShieldedWithdrawalParams,
   ProofResult,
-  PriorityLevel,
 } from './types';
+import type { PriorityLevel } from '../../types';
 import type { IProverClient } from '../../zk/ProverClient';
 
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
@@ -71,7 +71,7 @@ export class ShieldedTxBuilder {
 
   public async simulate(transaction: Transaction): Promise<boolean> {
     try {
-      const { value } = await this.connection.simulateTransaction(transaction, { replaceRecentBlockhash: true, sigVerify: false });
+      const { value } = await this.connection.simulateTransaction(transaction);
       if (value.err) return false;
       return true;
     } catch {

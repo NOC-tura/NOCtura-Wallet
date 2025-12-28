@@ -151,3 +151,8 @@ export class ProofGenerationError extends NocturaError {
     super('PROOF_GENERATION_FAILED', message);
   }
 }
+
+/**
+ * Transaction priority levels
+ */
+export type PriorityLevel = 'low' | 'medium' | 'high';

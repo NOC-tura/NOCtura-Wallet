@@ -161,7 +161,7 @@ export class TransparentSwapEngine {
 
     // Create swap record
     const swapTx: SwapTransaction = {
-      id: crypto.randomUUID(),
+      id: this.generateId(),
       status: SwapStatus.PENDING,
       inputMint,
       outputMint,
@@ -312,5 +312,12 @@ export class TransparentSwapEngine {
       console.error('Supported tokens fetch error:', error);
       return [];
     }
+  }
+
+  /**
+   * Generate unique ID
+   */
+  private generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }

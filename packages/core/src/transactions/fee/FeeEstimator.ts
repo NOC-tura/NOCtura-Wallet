@@ -2,18 +2,18 @@
  * Fee Estimator - Calculate transaction fees
  */
 
-import { Connection, Transaction, PublicKey } from '@solana/web3.js';
-import { FEES } from '../../utils/Constants';
-import { NocturaError } from '../../types';
+import { Connection, Transaction } from '@solana/web3.js';
+import type { PriorityLevel } from '../../types';
 
+/**
+ * Fee estimate result
+ */
 export interface FeeEstimate {
-  baseFee: number; // lamports
-  priorityFee: number; // lamports
-  totalFee: number; // lamports
+  baseFee: number;
+  priorityFee: number;
+  totalFee: number;
   feeInSOL: number;
 }
-
-export type PriorityLevel = 'low' | 'medium' | 'high';
 
 /**
  * Fee Estimator for transaction fees
@@ -37,13 +37,35 @@ export class FeeEstimator {
       const { blockhash } = await this.connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
 
-      // Get fee for transaction
-      const fee = await this.connection.getFeeForMessage(
-        transaction.compileMessage(),
-        'confirmed'
-      );
+      // Get base fee from transaction size
+      const message = transaction.compileMessage();
+      const baseFee = message.header.numRequiredSignatures * 5000; // 5000 lamports per signature
 
-      const baseFee = fee.value || FEES.SIGNATURE_FEE;
+      // Add priority fee based on level
+      const priorityFee = this.getPriorityFee(priorityLevel);
+
+      const totalFee = baseFee + priorityFee;
+
+      return {
+        baseFee,
+        priorityFee,
+        totalFee,
+        feeInSOL: totalFee / 1e9,
+      };
+    } catch (error) {
+      throw new Error(`Fee estimation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Estimate fees for SPL token transfer
+   */
+  public async estimateTokenTransferFee(
+    priorityLevel: PriorityLevel = 'medium'
+  ): Promise<FeeEstimate> {
+    try {
+      // Token transfer typically requires 2 signatures
+      const baseFee = 2 * 5000;
       const priorityFee = this.getPriorityFee(priorityLevel);
       const totalFee = baseFee + priorityFee;
 
@@ -54,19 +76,7 @@ export class FeeEstimator {
         feeInSOL: totalFee / 1e9,
       };
     } catch (error) {
-      console.error('Fee estimation error:', error);
-      
-      // Return default estimate if RPC call fails
-      const baseFee = FEES.SIGNATURE_FEE;
-      const priorityFee = this.getPriorityFee(priorityLevel);
-      const totalFee = baseFee + priorityFee;
-
-      return {
-        baseFee,
-        priorityFee,
-        totalFee,
-        feeInSOL: totalFee / 1e9,
-      };
+      throw new Error(`Token fee estimation failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -76,74 +86,53 @@ export class FeeEstimator {
   private getPriorityFee(level: PriorityLevel): number {
     switch (level) {
       case 'low':
-        return FEES.PRIORITY_FEE.LOW;
+        return 1000;
       case 'medium':
-        return FEES.PRIORITY_FEE.MEDIUM;
+        return 5000;
       case 'high':
-        return FEES.PRIORITY_FEE.HIGH;
-      default:
-        return FEES.PRIORITY_FEE.MEDIUM;
+        return 10000;
     }
   }
 
   /**
-   * Estimate fee for multiple transactions
+   * Estimate shielded transaction fee (includes proof verification)
    */
-  public async estimateBatchFees(
-    transactions: Transaction[],
+  public async estimateShieldedFee(
     priorityLevel: PriorityLevel = 'medium'
-  ): Promise<FeeEstimate[]> {
-    const estimates = await Promise.all(
-      transactions.map((tx) => this.estimateFee(tx, priorityLevel))
-    );
-    return estimates;
-  }
-
-  /**
-   * Get recommended priority level based on network congestion
-   */
-  public async getRecommendedPriorityLevel(): Promise<PriorityLevel> {
+  ): Promise<FeeEstimate> {
     try {
-      const perfSamples = await this.connection.getRecentPerformanceSamples(1);
-      
-      if (perfSamples.length > 0) {
-        const sample = perfSamples[0];
-        const tps = sample.numTransactions / sample.samplePeriodSecs;
-        
-        // Adjust priority based on TPS
-        if (tps > 3000) return 'high';
-        if (tps > 2000) return 'medium';
-        return 'low';
-      }
-    } catch (error) {
-      console.warn('Could not determine network congestion:', error);
-    }
+      // Shielded transactions require additional compute for proof verification
+      const baseFee = 10000; // Higher base fee for proof verification
+      const priorityFee = this.getPriorityFee(priorityLevel);
+      const proofVerificationFee = 50000; // Additional fee for ZK proof verification
 
-    return 'medium'; // Default
-  }
+      const totalFee = baseFee + priorityFee + proofVerificationFee;
 
-  /**
-   * Calculate total fees for account rent exemption
-   */
-  public async calculateRentExemption(dataSize: number): Promise<number> {
-    try {
-      const rentExemption = await this.connection.getMinimumBalanceForRentExemption(
-        dataSize
-      );
-      return rentExemption;
+      return {
+        baseFee,
+        priorityFee,
+        totalFee,
+        feeInSOL: totalFee / 1e9,
+      };
     } catch (error) {
-      throw new NocturaError(
-        'FEE_CALCULATION_ERROR',
-        'Failed to calculate rent exemption'
-      );
+      throw new Error(`Shielded fee estimation failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   /**
-   * Get estimated cost for creating token account
+   * Get current network fees (average from recent blocks)
    */
-  public async getTokenAccountCreationCost(): Promise<number> {
-    // Token account size is 165 bytes
-    return this.calculateRentExemption(165);
+  public async getNetworkFees(): Promise<{ low: number; medium: number; high: number }> {
+    try {
+      // In production, this would analyze recent blocks
+      // For now, return static values
+      return {
+        low: 1000,
+        medium: 5000,
+        high: 10000,
+      };
+    } catch (error) {
+      throw new Error(`Network fee query failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 }

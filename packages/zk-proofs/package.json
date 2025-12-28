@@ -18,7 +18,7 @@
     "@noble/curves": "^1.2.0"
   },
   "devDependencies": {
-    "circom": "^2.1.0",
-    "circom_tester": "^0.2.0"
+    "circom": "^0.5.46",
+    "circom_tester": "^0.0.24"
   }
 }

@@ -3,8 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "lib": ["ES2020", "DOM"]
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "WebWorker"],
+    "types": ["chrome"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "public"]
 }

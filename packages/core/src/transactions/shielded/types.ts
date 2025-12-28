@@ -2,7 +2,10 @@
  * Shielded transaction types
  */
 
-export type PriorityLevel = 'low' | 'medium' | 'high';
+/**
+ * Shielded transaction types
+ */
+import type { PriorityLevel } from '../../types';
 
 export interface ShieldedNote {
   commitment: string;

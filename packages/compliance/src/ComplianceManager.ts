@@ -2,7 +2,7 @@
  * Compliance Tools - Audit, View Keys, and Regulatory Support
  */
 
-import { NocturaError } from '../types';
+import { NocturaError } from '@noctura/core';
 
 /**
  * View Key types for selective disclosure
