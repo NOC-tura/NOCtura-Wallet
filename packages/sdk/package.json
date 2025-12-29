@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "jest",
+    "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

@@ -11,7 +11,8 @@
     "dev": "tsc --watch",
     "test": "jest",
     "lint": "eslint src",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "snarkjs": "^0.7.0",

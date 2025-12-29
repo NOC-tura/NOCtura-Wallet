@@ -49,6 +49,9 @@ tmp/
 temp/
 .cache/
 
+# Turborepo cache
+.turbo/
+
 # Compiled smart contracts
 *.wasm
 *.zkey
