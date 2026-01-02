@@ -79,7 +79,7 @@ app.get('/api/v1/wallet/:address/tokens', async (req: Request, res: Response) =>
     const { address } = req.params;
     
     // Placeholder: Get token balances
-    const tokens = [];
+    const tokens: any[] = [];
 
     res.json({
       address,
@@ -212,7 +212,7 @@ app.post('/api/v1/swap/quote', async (req: Request, res: Response) => {
 app.get('/api/v1/staking/validators', async (req: Request, res: Response) => {
   try {
     // Placeholder: Get validator list
-    const validators = [];
+    const validators: any[] = [];
 
     res.json({
       count: validators.length,

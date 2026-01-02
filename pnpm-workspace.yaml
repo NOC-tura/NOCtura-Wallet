@@ -1,10 +1,7 @@
 packages:
   - 'packages/*'
-apps:
   - 'apps/*'
-backend:
   - 'backend/*'
-tools:
   - 'tools/*'
 
 shared-workspace-lockfile: false

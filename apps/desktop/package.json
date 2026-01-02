@@ -5,5 +5,17 @@
     "dev": "tauri dev",
     "build": "tauri build",
     "lint": "eslint src"
+  },
+  "dependencies": {
+    "@noctura/sdk": "workspace:*",
+    "@noctura/ui-components": "workspace:*",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
   }
 }

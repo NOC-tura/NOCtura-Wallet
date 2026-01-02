@@ -1,0 +1,4 @@
+/**
+ * Shielded transaction types
+ */
+export {};
