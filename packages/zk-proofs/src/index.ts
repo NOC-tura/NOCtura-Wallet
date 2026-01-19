@@ -1,17 +1,22 @@
 /**
  * ZK-Proofs Package Entry Point
- * Placeholder for ZK-SNARK and STARK proof systems
+ * 
+ * Provides ZK-SNARK proof generation and verification for private transactions.
+ * Built on Poseidon hash for ZK-friendly operations.
  */
 
 export const ZK_PROOFS_VERSION = '0.1.0';
 
-// Placeholder interfaces
+// Re-export all circuit modules
+export * from './circuits';
+
+// Legacy interfaces for backward compatibility
 export interface Circuit {
-	name: string;
-	version: string;
+  name: string;
+  version: string;
 }
 
 export interface ProofGenerationOptions {
-	circuit: string;
-	witness: any;
+  circuit: string;
+  witness: unknown;
 }

@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@noctura/core": "workspace:*",
     "@noctura/sdk": "workspace:*",
     "@noctura/ui-components": "workspace:*",
     "lucide-react": "^0.468.0",

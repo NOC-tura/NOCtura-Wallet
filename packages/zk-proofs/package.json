@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "snarkjs": "^0.7.0",
-    "@noble/curves": "^1.2.0"
+    "@noble/curves": "^1.2.0",
+    "poseidon-lite": "^0.3.0"
   },
   "devDependencies": {
     "circom": "^0.5.46",

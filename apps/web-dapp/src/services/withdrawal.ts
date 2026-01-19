@@ -3,8 +3,35 @@ import { SOL_FEE_LAMPORTS } from '../utils/fees';
 import { formatNOC, formatSOL } from '../utils/format';
 import type { NoteDatabase, ShieldedNote } from '../types/note';
 import { generateSecureRandomBytes } from '../utils/crypto';
+import { createProverClient, type IProverClient, type ProverConfig } from '@noctura/sdk';
 
 const FEE_COLLECTOR = 'FEE_COLLECTOR';
+
+// Prover client instance - can be configured via setProverConfig
+let proverClient: IProverClient | null = null;
+let proverConfig: ProverConfig = { type: 'noop' }; // Default to noop for development
+
+/**
+ * Configure the prover client for withdrawal operations
+ */
+export function setProverConfig(config: ProverConfig): void {
+  proverConfig = config;
+  proverClient = null; // Reset client to be re-created with new config
+}
+
+/**
+ * Get or create the prover client instance
+ */
+function getProverClient(): IProverClient {
+  if (!proverClient) {
+    proverClient = createProverClient({
+      type: proverConfig.type,
+      remoteUrl: proverConfig.endpoint,
+      timeout: proverConfig.timeout,
+    });
+  }
+  return proverClient!;
+}
 
 export interface TransactionResult {
   success: boolean;
@@ -92,15 +119,62 @@ export async function withdrawFromShielded(
 }
 
 async function generateZKProof(payload: ProofPayload): Promise<{ proof: string; publicSignals: string[] }> {
-  // Placeholder stub for integration with prover service
-  const proofId = randomHex(16);
-  return { proof: `proof_${proofId}`, publicSignals: [String(payload.inputs.length), String(payload.outputs.length)] };
+  const client = getProverClient();
+  
+  // Calculate total output amount
+  const totalOutputAmount = payload.outputs.reduce((sum, out) => sum + out.amount, 0n);
+  
+  // Find the recipient (first non-fee-collector output)
+  const recipientOutput = payload.outputs.find(out => out.recipient !== FEE_COLLECTOR);
+  const recipientAddress = recipientOutput?.recipient || '';
+  
+  try {
+    const proofResult = await client.proveWithdrawal({
+      recipientAddress,
+      amount: totalOutputAmount,
+      assetMint: 'SOL',
+      feeLevel: 'medium',
+    });
+    return {
+      proof: proofResult.proof,
+      publicSignals: proofResult.publicSignals,
+    };
+  } catch (error) {
+    console.error('Proof generation failed:', error);
+    throw new Error(`Failed to generate ZK proof: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 async function submitShieldedTransaction(proof: { proof: string; publicSignals: string[] }): Promise<string> {
-  // Placeholder submission. In production, call relayer/cluster.
-  const signature = `shielded_${proof.proof}_${Date.now()}`;
+  // In production, this would submit to the relayer service
+  // For now, we create a transaction-like signature
+  const proofHash = await hashProofData(proof);
+  const signature = `shielded_tx_${proofHash}_${Date.now()}`;
+  
+  // TODO: Integrate with relayer service
+  // const response = await fetch(`${RELAYER_URL}/submit`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ proof, publicSignals }),
+  // });
+  // return response.json().signature;
+  
   return signature;
+}
+
+async function hashProofData(proof: { proof: string; publicSignals: string[] }): Promise<string> {
+  const data = JSON.stringify(proof);
+  const encoder = new TextEncoder();
+  const dataBuffer = encoder.encode(data);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateMerkleRoot(commitments: string[]): string {
+  // Placeholder merkle root - in production this would be computed from the actual tree
+  const combined = commitments.join('');
+  return `merkle_root_${randomHex(16)}`;
 }
 
 function randomHex(bytes: number): string {

@@ -38,3 +38,13 @@ export {
   TransactionFailedError,
   ProofGenerationError,
 } from './types';
+
+// Re-export prover client types
+export {
+  IProverClient,
+  NoopProverClient,
+  LocalProverClient,
+  RemoteProverClient,
+  createProverClient,
+  type ProverConfig,
+} from './zk/ProverClient';
