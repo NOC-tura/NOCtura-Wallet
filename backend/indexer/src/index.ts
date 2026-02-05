@@ -1,9 +1,40 @@
 /**
  * Noctura Indexer Service
  * 
- * Indexes Solana blockchain transactions and maintains wallet state.
+ * Indexes blockchain data for wallet state.
+ * TODO: Implement full indexer system
  */
 
-console.log('Indexer service - placeholder implementation');
+export const INDEXER_SERVICE_VERSION = '0.1.0';
 
-export default {};
+export interface IndexerConfig {
+  rpcEndpoint: string;
+  startBlock?: number;
+  batchSize: number;
+}
+
+export interface IndexedTransaction {
+  signature: string;
+  blockNumber: number;
+  timestamp: Date;
+  type: 'deposit' | 'withdrawal' | 'transfer';
+}
+
+export class IndexerService {
+  private config: IndexerConfig;
+
+  constructor(config: IndexerConfig) {
+    this.config = config;
+  }
+
+  async start(): Promise<void> {
+    console.log('Indexer starting...');
+    // TODO: Implement blockchain indexing
+  }
+
+  async stop(): Promise<void> {
+    console.log('Indexer stopping...');
+  }
+}
+
+export default IndexerService;

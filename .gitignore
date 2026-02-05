@@ -88,3 +88,18 @@ packages/zk-proofs/compiled/**/*.wasm
 *.pem
 *.key
 !public.pem
+
+# Wallet/Keypair files - NEVER commit these
+**/wallet.json
+**/keypair.json
+**/secret.json
+*.keypair
+*.seed
+*.mnemonic
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+secrets/
+private/

@@ -3,8 +3,10 @@
  */
 
 export * from './types';
+export * from './crypto';
 export * from './wallet/WalletManager';
 export * from './wallet/AccountManager';
+export * from './wallet/NocturaWallet';
 export * from './network/NetworkManager';
 export * from './tokens/TokenRegistry';
 export * from './tokens/types';

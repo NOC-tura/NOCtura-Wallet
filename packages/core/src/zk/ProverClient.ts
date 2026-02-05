@@ -229,7 +229,7 @@ export class RemoteProverClient implements IProverClient {
         throw new Error(`Prover service error: ${response.status} - ${error}`);
       }
 
-      const result = await response.json();
+      const result = await response.json() as { proof: string; publicSignals?: string[] };
       return {
         proof: result.proof,
         publicSignals: result.publicSignals || [],

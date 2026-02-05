@@ -6,8 +6,8 @@
 // Inject provider script
 const script = document.createElement('script');
 script.src = chrome.runtime.getURL('injected.js');
-script.onload = function () {
-  this.remove();
+script.onload = () => {
+  script.parentNode?.removeChild(script);
 };
 (document.head || document.documentElement).appendChild(script);
 
@@ -42,7 +42,7 @@ window.addEventListener('message', async (event) => {
       {
         type: `${message.type}_RESPONSE`,
         id: message.id,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       '*'
     );

@@ -1,0 +1,33 @@
+{
+  "name": "Noctura",
+  "symbol": "NOC",
+  "description": "Native token of the Noctura Privacy Protocol - used for shielded transaction fees, governance, and staking",
+  "decimals": 9,
+  "network": "devnet",
+  "addresses": {
+    "devnet": {
+      "mint": "GcqvfVfosg4BmUHng97v4dToPxsLk5R4gL2JCXV7x3Rb",
+      "tokenAccount": "ggsqo7kBTXV3Wi533LY2746AYH7xpcJgw6p5CCh9YGS",
+      "mintAuthority": "HWczhVWGEnFuSm96a2vR5v3YHxaPbNLYFFJoCqgpVUSa"
+    },
+    "testnet": {
+      "mint": null,
+      "tokenAccount": null,
+      "mintAuthority": null
+    },
+    "mainnet": {
+      "mint": null,
+      "tokenAccount": null,
+      "mintAuthority": null
+    }
+  },
+  "supply": {
+    "total": 1000000000,
+    "circulating": 1000000000
+  },
+  "logo": "https://noctura.io/assets/noc-token-logo.png",
+  "website": "https://noctura.io",
+  "coingeckoId": null,
+  "tags": ["privacy", "governance", "utility"],
+  "createdAt": "2026-02-05T00:00:00.000Z"
+}

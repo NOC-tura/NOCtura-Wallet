@@ -10,5 +10,22 @@
   "rpc_endpoints": {
     "primary": "https://api.devnet.solana.com",
     "backup": ["https://devnet.rpcpool.com"]
+  },
+  "tokens": {
+    "NOC": {
+      "mint": "GcqvfVfosg4BmUHng97v4dToPxsLk5R4gL2JCXV7x3Rb",
+      "decimals": 9,
+      "name": "Noctura",
+      "symbol": "NOC"
+    },
+    "SOL": {
+      "mint": "So11111111111111111111111111111111111111112",
+      "decimals": 9,
+      "name": "Solana",
+      "symbol": "SOL"
+    }
+  },
+  "treasury": {
+    "wallet": "HWczhVWGEnFuSm96a2vR5v3YHxaPbNLYFFJoCqgpVUSa"
   }
 }

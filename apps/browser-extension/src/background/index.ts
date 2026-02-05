@@ -2,6 +2,15 @@
  * Background Service Worker for Noctura Wallet Extension
  */
 
+// Type definitions
+interface WalletResponse {
+  success?: boolean;
+  error?: string;
+  data?: unknown;
+}
+
+type SendResponse = (response: WalletResponse) => void;
+
 // Listen for extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
@@ -53,7 +62,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Handle wallet state
-async function handleGetWalletState(sendResponse) {
+async function handleGetWalletState(sendResponse: SendResponse): Promise<void> {
   try {
     const state = await chrome.storage.local.get(['wallet', 'locked']);
     sendResponse({
@@ -66,13 +75,13 @@ async function handleGetWalletState(sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle wallet creation
-async function handleCreateWallet(data, sendResponse) {
+async function handleCreateWallet(data: unknown, sendResponse: SendResponse): Promise<void> {
   try {
     // Placeholder: Implement actual wallet creation
     // 1. Generate mnemonic
@@ -96,13 +105,13 @@ async function handleCreateWallet(data, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle wallet import
-async function handleImportWallet(data, sendResponse) {
+async function handleImportWallet(data: { seedPhrase?: string; password?: string }, sendResponse: SendResponse): Promise<void> {
   try {
     const { seedPhrase, password } = data;
 
@@ -129,13 +138,13 @@ async function handleImportWallet(data, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle transaction sending
-async function handleSendTransaction(data, sendResponse) {
+async function handleSendTransaction(data: { to?: string; amount?: number; mode?: string }, sendResponse: SendResponse): Promise<void> {
   try {
     const { to, amount, mode } = data;
 
@@ -157,13 +166,13 @@ async function handleSendTransaction(data, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle balance retrieval
-async function handleGetBalance(data, sendResponse) {
+async function handleGetBalance(data: { address?: string }, sendResponse: SendResponse): Promise<void> {
   try {
     const { address } = data;
 
@@ -180,23 +189,24 @@ async function handleGetBalance(data, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle DApp connection request
-async function handleConnectDapp(data, sender, sendResponse) {
+async function handleConnectDapp(data: { origin?: string }, sender: chrome.runtime.MessageSender, sendResponse: SendResponse): Promise<void> {
   try {
     const { origin } = data;
 
     // Show connection approval popup
-    const approval = await showConnectionApproval(origin);
+    const approval = await showConnectionApproval(origin || '');
 
     if (approval) {
       // Store approved connection
-      const connections = await chrome.storage.local.get('connections') || {};
-      connections[origin] = {
+      const result = await chrome.storage.local.get('connections');
+      const connections: Record<string, unknown> = result.connections || {};
+      connections[origin || ''] = {
         approved: true,
         approvedAt: new Date().toISOString(),
       };
@@ -218,13 +228,13 @@ async function handleConnectDapp(data, sender, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Handle message signing
-async function handleSignMessage(data, sendResponse) {
+async function handleSignMessage(data: { message?: string }, sendResponse: SendResponse): Promise<void> {
   try {
     const { message } = data;
 
@@ -238,20 +248,21 @@ async function handleSignMessage(data, sendResponse) {
   } catch (error) {
     sendResponse({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
 
 // Show connection approval popup
-async function showConnectionApproval(origin) {
+async function showConnectionApproval(origin: string): Promise<boolean> {
   // Placeholder: Show approval UI
   return true;
 }
 
 // Auto-lock wallet after timeout
-let lockTimeout;
-function resetLockTimeout() {
+let lockTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function resetLockTimeout(): void {
   if (lockTimeout) {
     clearTimeout(lockTimeout);
   }

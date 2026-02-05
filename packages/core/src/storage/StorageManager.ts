@@ -13,7 +13,7 @@ export interface WalletData {
   address: string;
   encryptedSeed?: string;
   accounts: AccountData[];
-  settings: WalletSettings;
+  settings: StorageWalletSettings;
   lastBackup?: Date;
 }
 
@@ -25,7 +25,7 @@ export interface AccountData {
   hidden?: boolean;
 }
 
-export interface WalletSettings {
+export interface StorageWalletSettings {
   autoLock: boolean;
   autoLockTime: number;
   biometricEnabled: boolean;
@@ -106,14 +106,14 @@ export abstract class StorageManager {
   /**
    * Save wallet settings
    */
-  public async saveSettings(settings: WalletSettings): Promise<void> {
+  public async saveSettings(settings: StorageWalletSettings): Promise<void> {
     await this.setItem('settings', JSON.stringify(settings));
   }
 
   /**
    * Load wallet settings
    */
-  public async loadSettings(): Promise<WalletSettings | null> {
+  public async loadSettings(): Promise<StorageWalletSettings | null> {
     const data = await this.getItem('settings');
     return data ? JSON.parse(data) : null;
   }
