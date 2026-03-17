@@ -1,18 +1,30 @@
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, TransactionInstruction, Keypair } from '@solana/web3.js';
 import { isValidSolanaAddress } from '../../utils/Validation';
 import type {
   ShieldedTransferParams,
   ShieldedDepositParams,
   ShieldedWithdrawalParams,
   ProofResult,
+  ShieldedNote,
 } from './types';
 import type { PriorityLevel } from '../../types';
 import type { IProverClient } from '../../zk/ProverClient';
+import { FeeEstimator } from '../fee/FeeEstimator';
 
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 
+export interface ShieldedTxResult {
+  transaction: Transaction;
+  proof: ProofResult;
+  note?: ShieldedNote;
+}
+
 export class ShieldedTxBuilder {
-  constructor(private connection: Connection, private prover: IProverClient) {}
+  private feeEstimator: FeeEstimator;
+
+  constructor(private connection: Connection, private prover: IProverClient) {
+    this.feeEstimator = new FeeEstimator(connection);
+  }
 
   public async buildShieldedTransfer(params: ShieldedTransferParams): Promise<{ transaction: Transaction; proof: ProofResult }> {
     this.validateRecipient(params.recipientAddress);
@@ -98,5 +110,105 @@ export class ShieldedTxBuilder {
       keys: [],
       data,
     });
+  }
+
+  /**
+   * Generate a commitment for a shielded note
+   */
+  public async generateCommitment(
+    amount: bigint,
+    recipient: string,
+    randomness?: Uint8Array
+  ): Promise<string> {
+    // Use prover to generate commitment
+    const commitment = await this.prover.generateCommitment({
+      amount,
+      recipient,
+      randomness: randomness || crypto.getRandomValues(new Uint8Array(32)),
+    });
+    return commitment;
+  }
+
+  /**
+   * Generate a nullifier for a spent note
+   */
+  public async generateNullifier(
+    commitment: string,
+    secretKey: Uint8Array
+  ): Promise<string> {
+    const nullifier = await this.prover.generateNullifier({
+      commitment,
+      secretKey,
+    });
+    return nullifier;
+  }
+
+  /**
+   * Estimate fee for shielded transaction
+   */
+  public async estimateFee(
+    priorityLevel: PriorityLevel = 'medium'
+  ): Promise<{ baseFee: number; priorityFee: number; totalFee: number; feeInSOL: number }> {
+    return this.feeEstimator.estimateShieldedFee(priorityLevel);
+  }
+
+  /**
+   * Create a shielded note for deposit
+   */
+  public createNote(
+    amount: bigint,
+    commitment: string,
+    assetMint?: string
+  ): ShieldedNote {
+    return {
+      commitment,
+      value: amount,
+      assetMint,
+    };
+  }
+
+  /**
+   * Verify a proof is valid
+   */
+  public async verifyProof(proof: ProofResult): Promise<boolean> {
+    return this.prover.verifyProof(proof);
+  }
+
+  /**
+   * Build and sign a complete shielded transfer
+   */
+  public async buildAndSignShieldedTransfer(
+    params: ShieldedTransferParams,
+    signer: Keypair
+  ): Promise<ShieldedTxResult> {
+    const result = await this.buildShieldedTransfer(params);
+    
+    // Add recent blockhash
+    const { blockhash } = await this.connection.getLatestBlockhash();
+    result.transaction.recentBlockhash = blockhash;
+    result.transaction.feePayer = signer.publicKey;
+    
+    // Sign transaction
+    result.transaction.sign(signer);
+    
+    // Create note for recipient
+    const commitment = await this.generateCommitment(
+      params.amount,
+      params.recipientAddress
+    );
+    
+    const note = this.createNote(params.amount, commitment, params.assetMint);
+    
+    return {
+      ...result,
+      note,
+    };
+  }
+
+  /**
+   * Get the connection
+   */
+  public getConnection(): Connection {
+    return this.connection;
   }
 }

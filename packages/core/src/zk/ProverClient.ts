@@ -13,12 +13,32 @@ import type {
 } from '../transactions/shielded/types';
 
 /**
+ * Commitment generation params
+ */
+export interface CommitmentParams {
+  amount: bigint;
+  recipient: string;
+  randomness: Uint8Array;
+}
+
+/**
+ * Nullifier generation params
+ */
+export interface NullifierParams {
+  commitment: string;
+  secretKey: Uint8Array;
+}
+
+/**
  * Interface for prover clients
  */
 export interface IProverClient {
   proveShieldedTransfer(params: ShieldedTransferParams): Promise<ProofResult>;
   proveDeposit(params: ShieldedDepositParams): Promise<ProofResult>;
   proveWithdrawal(params: ShieldedWithdrawalParams): Promise<ProofResult>;
+  generateCommitment(params: CommitmentParams): Promise<string>;
+  generateNullifier(params: NullifierParams): Promise<string>;
+  verifyProof(proof: ProofResult): Promise<boolean>;
 }
 
 /**
@@ -36,6 +56,22 @@ export class NoopProverClient implements IProverClient {
 
   async proveWithdrawal(_params: ShieldedWithdrawalParams): Promise<ProofResult> {
     return { proof: 'DUMMY_PROOF_WITHDRAWAL', publicSignals: [] };
+  }
+
+  async generateCommitment(params: CommitmentParams): Promise<string> {
+    // Simple hash-based commitment for testing
+    const data = `${params.amount}:${params.recipient}:${Buffer.from(params.randomness).toString('hex')}`;
+    return `COMMIT_${Buffer.from(data).toString('base64').slice(0, 32)}`;
+  }
+
+  async generateNullifier(params: NullifierParams): Promise<string> {
+    const data = `${params.commitment}:${Buffer.from(params.secretKey).toString('hex')}`;
+    return `NULL_${Buffer.from(data).toString('base64').slice(0, 32)}`;
+  }
+
+  async verifyProof(_proof: ProofResult): Promise<boolean> {
+    // Noop always returns true for testing
+    return true;
   }
 }
 
@@ -166,6 +202,50 @@ export class LocalProverClient implements IProverClient {
     }
     return Math.abs(hash).toString(16).padStart(64, '0');
   }
+
+  async generateCommitment(params: CommitmentParams): Promise<string> {
+    await this.ensureInitialized();
+    
+    const data = {
+      amount: params.amount.toString(),
+      recipient: params.recipient,
+      randomness: Buffer.from(params.randomness).toString('hex'),
+    };
+    
+    const hash = await this.hashProofData(data);
+    return hash;
+  }
+
+  async generateNullifier(params: NullifierParams): Promise<string> {
+    await this.ensureInitialized();
+    
+    const data = {
+      commitment: params.commitment,
+      secretKey: Buffer.from(params.secretKey).toString('hex'),
+    };
+    
+    const hash = await this.hashProofData(data);
+    return hash;
+  }
+
+  async verifyProof(proof: ProofResult): Promise<boolean> {
+    await this.ensureInitialized();
+    
+    try {
+      // Parse the proof to verify structure
+      const parsed = JSON.parse(proof.proof);
+      
+      // Verify basic structure
+      if (!parsed.pi_a || !parsed.pi_b || !parsed.pi_c) {
+        return false;
+      }
+      
+      // In a real implementation, this would perform cryptographic verification
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 /**
@@ -236,6 +316,44 @@ export class RemoteProverClient implements IProverClient {
       };
     } finally {
       clearTimeout(timeoutId);
+    }
+  }
+
+  async generateCommitment(params: CommitmentParams): Promise<string> {
+    const response = await this.requestProof('/generate/commitment', {
+      amount: params.amount.toString(),
+      recipient: params.recipient,
+      randomness: Buffer.from(params.randomness).toString('hex'),
+    });
+    return response.proof;
+  }
+
+  async generateNullifier(params: NullifierParams): Promise<string> {
+    const response = await this.requestProof('/generate/nullifier', {
+      commitment: params.commitment,
+      secretKey: Buffer.from(params.secretKey).toString('hex'),
+    });
+    return response.proof;
+  }
+
+  async verifyProof(proof: ProofResult): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseUrl}/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proof),
+      });
+      
+      if (!response.ok) {
+        return false;
+      }
+      
+      const result = await response.json() as { valid: boolean };
+      return result.valid;
+    } catch {
+      return false;
     }
   }
 }
