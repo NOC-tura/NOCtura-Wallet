@@ -4,8 +4,6 @@
     "module": "ESNext",
     "lib": ["ES2020"],
     "declaration": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,6 +13,16 @@
     "allowSyntheticDefaultImports": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "build"]
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/sdk" },
+    { "path": "packages/zk-proofs" },
+    { "path": "packages/mixing" },
+    { "path": "packages/compliance" },
+    { "path": "packages/ui-components" },
+    { "path": "backend/api-server" },
+    { "path": "backend/prover-service" },
+    { "path": "apps/browser-extension" }
+  ]
 }
